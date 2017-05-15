@@ -1,0 +1,22 @@
+[elkstack]
+ELK ansible_ssh_host=192.168.58.103
+
+[elastic_all]
+ES1 ansible_ssh_host=192.168.58.104
+#ES2 ansible_ssh_host=192.168.58.105
+#ES3 ansible_ssh_host=192.168.58.106
+ES4 ansible_ssh_host=192.168.58.107
+
+[elastic_master]
+ES1 ansible_ssh_host=192.168.58.104
+#ES2 ansible_ssh_host=192.168.58.105
+#ES3 ansible_ssh_host=192.168.58.106
+
+[elastic_data]
+ES4 ansible_ssh_host=192.168.58.107
+
+[logstash]
+LS1 ansible_ssh_host=192.168.58.108
+
+[kibana]
+ES1 ansible_ssh_host=192.168.58.104

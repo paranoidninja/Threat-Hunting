@@ -1,0 +1,77 @@
+---
+- name: Checking whether https support for apt is installed
+  apt:
+    pkg: apt-transport-https
+    update_cache: yes
+    state: present
+
+- name: Checking whether gpg signing key for elkstack is installed
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+- name: Checking whether ELK-stack repo has been added
+  apt_repository:
+    repo: 'deb https://artifacts.elastic.co/packages/5.x/apt stable main'
+    filename: 'elastic-5.x'
+    update_cache: yes
+    state: present
+
+- name: Installing Logstash
+  apt:
+    name:
+      - logstash
+      - openjdk-8-jre
+      - git
+      - wget
+      - curl
+    state: present
+
+- name: Stopping Logstash Service
+  service:
+    name: logstash
+    state: stopped
+
+- name: Changing Java minimum heap size for Logstash in jvm.options to- {{min_heap_size}}
+  replace:
+    dest: '/etc/logstash/jvm.options'
+    regexp: '-Xms[0-9]g'
+    replace: '{{min_heap_size}}'
+
+- name: Changing Java maximum heap size for Logstash in jvm.options to- {{max_heap_size}}
+  replace:
+    dest: '/etc/logstash/jvm.options'
+    regexp: '-Xmx[0-9]g'
+    replace: '{{max_heap_size}}'
+
+- name: Reload System Daemon to reread all config files
+  systemd:
+    name: logstash
+    daemon_reload: yes
+
+- name: Checking Useragent plugin
+  shell: "{{ls_home}}/bin/logstash-plugin list | grep useragent"
+  register: useragent_state
+  ignore_errors: yes
+
+- name: Installing Useragent Plugin
+  shell: "{{ls_home}}/bin/logstash-plugin install logstash-filter-useragent"
+  when: useragent_state.stdout == ""
+
+- name: Checking GeoIp plugin
+  shell: "{{ls_home}}/bin/logstash-plugin list | grep geoip"
+  register: geoip_state
+  ignore_errors: yes
+
+- name: Installing GeoIp Plugin
+  shell: "{{ls_home}}/bin/logstash-plugin install logstash-filter-geoip"
+  when: geoip_state.stdout == ""
+
+- name: Checking Translate plugin
+  shell: "{{ls_home}}/bin/logstash-plugin list | grep translate"
+  register: translate_state
+  ignore_errors: yes
+
+- name: Installing Translate Plugin
+  shell: "{{ls_home}}/bin/logstash-plugin install logstash-filter-translate"
+  when: translate_state.stdout == ""

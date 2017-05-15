@@ -1,0 +1,107 @@
+#This file should not be edited. This file contains execution of roles based on
+#the boolean value of the variables in vars/main.yml
+---
+- hosts: elkstack
+  gather_facts: false
+  tasks:
+    - name: Including variables
+      include_vars:
+        file: '../vars/main.yml'
+
+    - include: ../roles/elastic.yml
+      when: elkstack_install
+
+    - include: ../roles/logstash.yml
+      when: elkstack_install
+
+    - include: ../roles/kibana.yml
+      when: elkstack_install
+
+
+- hosts: elastic_all
+  gather_facts: false
+  tasks:
+    - name: Including variables
+      include_vars:
+        file: '../vars/main.yml'
+
+    - name: Checking whether Elasticsearch is required
+      include: ../roles/elastic.yml
+      when: elastic_all_install
+
+- hosts: elastic_all
+  gather_facts: false
+  tasks:
+    - name: Including variables
+      include_vars:
+        file: '../vars/main.yml'
+
+    - name: Checking whether Elasticsearch is required
+      include: ../roles/elastic_cloud.yml
+      when: elastic_cloud_install
+
+- hosts: elastic_master
+  gather_facts: false
+  tasks:
+    - name: Including variables
+      include_vars:
+        file: '../vars/main.yml'
+
+    - name: Checking whether Elasticsearch Master Nodes are required
+      include: ../roles/elastic_master.yml
+      when: elastic_master_install
+
+- hosts: elastic_master
+  gather_facts: false
+  tasks:
+    - name: Including variables
+      include_vars:
+        file: '../vars/main.yml'
+
+    - name: Checking whether Elasticsearch Cloud Master Nodes are required
+      include: ../roles/elastic_master_cloud.yml
+      when: elastic_master_cloud_install
+
+- hosts: elastic_data
+  gather_facts: false
+  tasks:
+    - name: Including variables
+      include_vars:
+        file: '../vars/main.yml'
+
+    - name: Checking whether Elasticsearch Data Nodes are required
+      include: ../roles/elastic_data.yml
+      when: elastic_data_install
+
+- hosts: elastic_data
+  gather_facts: false
+  tasks:
+    - name: Including variables
+      include_vars:
+        file: '../vars/main.yml'
+
+    - name: Checking whether Elasticsearch Cloud Data Nodes are required
+      include: ../roles/elastic_data_cloud.yml
+      when: elastic_data_cloud_install
+
+- hosts: logstash
+  gather_facts: false
+  tasks:
+    - name: Including variables
+      include_vars:
+        file: '../vars/main.yml'
+
+    - name: Checking whether Logstash Node is required
+      include: ../roles/logstash.yml
+      when: logstash_install
+
+- hosts: kibana
+  gather_facts: false
+  tasks:
+    - name: Including variables
+      include_vars:
+        file: '../vars/main.yml'    
+
+    - name: Checking whether Kibana Service is required
+      include: ../roles/kibana.yml
+      when: kibana_install

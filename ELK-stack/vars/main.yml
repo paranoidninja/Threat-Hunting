@@ -1,0 +1,55 @@
+#This file contains all the necessary things that need to be installed.
+#The value needs to be a boolean value as to what should be installed and what should be ignored.
+---
+elkstack_install: false
+
+elastic_all_install: false
+
+elastic_cloud_install: true
+
+elastic_master_install: false
+
+elastic_master_cloud_install: true
+
+elastic_data_install: false
+
+elastic_data_cloud_install: true
+
+logstash_install: false
+
+kibana_install: false
+
+#xpack_plugin: false
+#geoip_plugin: false
+#translate_plugin: false
+#useragent_plugin: false
+
+es_home: '/usr/share/elasticsearch'
+
+kb_home: '/usr/share/kibana'
+
+ls_home: '/usr/share/logstash'
+
+min_heap_size: '-Xms1g'
+
+max_heap_size: '-Xmx1g'
+
+discovery_hosts: 'discovery.zen.ping.unicast.hosts: ["", "", "", "", "" ]'
+
+self_host_ip: '34.'
+
+#cloud config
+
+cl_ac_key: 'cloud.aws.access_key: AKIAIVII7RDQGYQT4KIQ'
+
+cl_sc_key: 'cloud.aws.secret_key: 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'
+
+cl_region: 'cloud.aws.region: us-east-1'
+
+network_host: 'network.host: [ "_ec2:privateIpv4_", "_local_" ]'
+
+network_bind_host: 'network.bind_host: _ec2:privateIpv4_'
+
+network_publish_host: 'network.publish_host: _ec2:privateIpv4_'
+
+discovery_type: 'discovery.type: ec2'

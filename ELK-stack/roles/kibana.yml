@@ -1,0 +1,60 @@
+---
+- name: Checking whether https support for apt is installed
+  apt:
+    pkg: apt-transport-https
+    update_cache: yes
+    state: present
+
+- name: Checking whether gpg signing key for elkstack is installed
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+- name: Checking whether ELK-stack repo has been added
+  apt_repository:
+    repo: 'deb https://artifacts.elastic.co/packages/5.x/apt stable main'
+    filename: 'elastic-5.x'
+    update_cache: yes
+    state: present
+
+- name: Installing Kibana
+  apt:
+    name:
+      - kibana
+      - openjdk-8-jre
+      - git
+      - wget
+      - curl
+    state: present
+
+- name: Stopping Kibana Service and adding in on boot
+  service:
+    name: kibana
+    state: stopped
+    enabled: yes
+
+- name: Changing Listening IP in Kibana yaml file
+  replace:
+    dest: '/etc/kibana/kibana.yml'
+    regexp: '#server.host: "localhost"'
+    replace: 'server.host: "0.0.0.0"'
+
+- name: Checking IP Address
+  shell: "ifconfig | grep {{ self_host_ip }} | cut -f2 -d':' | awk 'NR==1{print $1}'"
+  register: kibana_network_ip
+
+- name: Changing Elastic IP in Kibana yaml file
+  replace:
+    dest: '/etc/kibana/kibana.yml'
+    regexp: '#elasticsearch.url: "http://localhost:9200"'
+    replace: 'elasticsearch.url: "http://{{ kibana_network_ip.stdout }}:9200"'
+
+- name: Starting Kibana Service
+  service:
+    name: kibana
+    state: started
+
+- name: Reload System Daemon to reread all config files
+  systemd:
+    name: elastic
+    daemon_reload: yes

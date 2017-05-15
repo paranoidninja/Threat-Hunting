@@ -1,0 +1,108 @@
+---
+- name: Checking Discovery plugin
+  shell: "{{es_home}}/bin/elasticsearch-plugin list | grep 'discovery-ec2'"
+  register: discovery_state
+  ignore_errors: yes
+
+- name: Installing Discovery Plugin
+  shell: "{{es_home}}/bin/elasticsearch-plugin install discovery-ec2"
+  when: discovery_state.stdout == ""
+
+- name: Changing Network Host in Elastic yaml file
+  lineinfile:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    line: '{{ network_host }}'
+    state: present
+
+- name: Changing Network Bind host in Elastic yaml file
+  lineinfile:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    line: '{{ network_bind_host }}'
+    state: present
+
+- name: Changing Network Publish host in Elastic yaml file
+  lineinfile:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    line: '{{ network_publish_host }}'
+    state: present
+
+- name: Changing Discovery type in Elastic yaml file
+  lineinfile:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    line: '{{ discovery_type }}'
+    state: present
+
+- name: Changing Cloud Access Key in Elastic yaml file
+  lineinfile:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    line: '{{ cl_ac_key }}'
+    state: present
+
+- name: Changing Cloud Secret Key in Elastic yaml file
+  lineinfile:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    line: '{{ cl_sc_key }}'
+    state: present
+
+- name: Changing Cloud Region in Elastic yaml file
+  lineinfile:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    line: '{{ cl_region }}'
+    state: present
+
+- name: Adding Cluster Name
+  replace:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    regexp: '#cluster.name: my-application'
+    replace: 'cluster.name: Anarchy_cloud'
+
+- name: Enabling memlock in Elastic yaml file
+  replace:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    regexp: '#bootstrap.memory_lock: true'
+    replace: 'bootstrap.memory_lock: true'
+
+- name: Changing Node Discoveries
+  replace:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    regexp: '^#discovery.zen.ping.unicast.hosts: \["host1", "host2"\]'
+    replace: '{{ discovery_hosts }}'
+
+- name: Disabling Data node
+  lineinfile:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    line: 'node.data: true'
+    state: present
+
+- name: Enabling Master node
+  lineinfile:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    line: 'node.master: false'
+    state: present
+
+- name: Changing Minimum Master nodes
+  replace:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    regexp: '#discovery.zen.minimum_master_nodes: 3'
+    replace: 'discovery.zen.minimum_master_nodes: 2'
+
+- name: Removing all Comments
+  lineinfile:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    regexp: '^[#].*'
+    state: absent
+
+- name: Stopping Elasticsearch Service
+  service:
+    name: elasticsearch
+    state: stopped
+
+- name: Reload System Daemon to reread all config files
+  systemd:
+    name: elastic
+    daemon_reload: yes
+
+- name: Starting Elasticsearch Service
+  service:
+    name: elasticsearch
+    state: started

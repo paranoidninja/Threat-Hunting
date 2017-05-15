@@ -1,0 +1,89 @@
+---
+- name: Checking whether https support for apt is installed
+  apt:
+    pkg: apt-transport-https
+    update_cache: yes
+    state: present
+
+- name: Checking whether gpg signing key for elkstack is installed
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+- name: Checking whether ELK-stack repo has been added
+  apt_repository:
+    repo: 'deb https://artifacts.elastic.co/packages/5.x/apt stable main'
+    filename: 'elastic-5.x'
+    update_cache: yes
+    state: present
+
+- name: Installing Elasticsearch
+  apt:
+    name:
+      - elasticsearch
+      - openjdk-8-jre
+      - git
+      - wget
+      - curl
+    state: present
+
+- name: Stopping Elasticsearch Service and adding it on boot
+  service:
+    name: elasticsearch
+    state: stopped
+    enabled: yes
+
+- name: Checking IP Address
+  shell: "ifconfig | grep {{ self_host_ip }} | cut -f2 -d':' | awk 'NR==1{print $1}'"
+  register: elast_network_ip
+
+- name: Making network changes in Elastic yaml file
+  replace:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    regexp: '#network.host: 192.168.0.1'
+    replace: 'network.host: {{ elast_network_ip.stdout }}'
+
+- name: Enabling memlock in Elastic yaml file
+  replace:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    regexp: '#bootstrap.memory_lock: true'
+    replace: 'bootstrap.memory_lock: true'
+
+#^till here
+
+- name: Setting memlock to infinite in Elastic service file
+  replace:
+    dest: '/usr/lib/systemd/system/elasticsearch.service'
+    regexp: '#LimitMEMLOCK=infinity'
+    replace: 'LimitMEMLOCK=infinity'
+
+- name: Changing locked memory state in Elastic service file
+  replace:
+    dest: '/etc/default/elasticsearch'
+    regexp: '#MAX_LOCKED_MEMORY=unlimited'
+    replace: 'MAX_LOCKED_MEMORY=unlimited'
+
+- name: Changing limit for open number of files(for swap)
+  shell: "ulimit -l unlimited"
+
+- name: Changing Java minimum heap size for Elastic in jvm.options to- {{min_heap_size}}
+  replace:
+    dest: '/etc/elasticsearch/jvm.options'
+    regexp: '-Xms[0-9]g'
+    replace: '{{min_heap_size}}'
+
+- name: Changing Java maximum heap size for Elastic in jvm.options to- {{max_heap_size}}
+  replace:
+    dest: '/etc/elasticsearch/jvm.options'
+    regexp: '-Xmx[0-9]g'
+    replace: '{{max_heap_size}}'
+
+- name: Reload System Daemon to reread all config files
+  systemd:
+    name: elastic
+    daemon_reload: yes
+
+- name: Starting Elasticsearch Service
+  service:
+    name: elasticsearch
+    state: started
