@@ -1,31 +1,15 @@
 ---
-- name: Checking IP Address
-  shell: "ifconfig | grep {{ self_host_ip }} | cut -f2 -d':' | awk 'NR==1{print $1}'"
-  register: elast_network_ip
-
-- name: Making network changes in Elastic yaml file
-  replace:
-    dest: '/etc/elasticsearch/elasticsearch.yml'
-    regexp: '#network.host: 192.168.0.1'
-    replace: 'network.host: {{ elast_network_ip.stdout }}'
-
 - name: Adding Cluster Name
-  replace:
+  lineinfile:
     dest: '/etc/elasticsearch/elasticsearch.yml'
-    regexp: '#cluster.name: my-application'
-    replace: 'cluster.name: Anarchy'
-
-- name: Enabling memlock in Elastic yaml file
-  replace:
-    dest: '/etc/elasticsearch/elasticsearch.yml'
-    regexp: '#bootstrap.memory_lock: true'
-    replace: 'bootstrap.memory_lock: true'
+    line: 'cluster.name: Anarchy'
+    state: present
 
 - name: Changing Node Discoveries
-  replace:
+  lineinfile:
     dest: '/etc/elasticsearch/elasticsearch.yml'
-    regexp: '^#discovery.zen.ping.unicast.hosts: \["host1", "host2"\]'
-    replace: '{{ discovery_hosts }}'
+    line: '{{ discovery_hosts }}'
+    state: present
 
 - name: Enabling Data node
   lineinfile:
@@ -40,10 +24,10 @@
     state: present
 
 - name: Changing Minimum Master nodes
-  replace:
+  lineinfile:
     dest: '/etc/elasticsearch/elasticsearch.yml'
-    regexp: '#discovery.zen.minimum_master_nodes: 3'
-    replace: 'discovery.zen.minimum_master_nodes: 2'
+    line: 'discovery.zen.minimum_master_nodes: 2'
+    state: present
 
 - name: Removing all Comments
   lineinfile:

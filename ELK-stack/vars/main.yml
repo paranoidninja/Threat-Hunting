@@ -3,21 +3,21 @@
 ---
 elkstack_install: false
 
-elastic_all_install: false
+elastic_all_install: true
 
-elastic_cloud_install: true
+elastic_cloud_install: false
 
-elastic_master_install: false
+elastic_master_install: true
 
-elastic_master_cloud_install: true
+elastic_master_cloud_install: false
 
-elastic_data_install: false
+elastic_data_install: true
 
-elastic_data_cloud_install: true
+elastic_data_cloud_install: false
 
 logstash_install: false
 
-kibana_install: false
+kibana_install: true
 
 #xpack_plugin: false
 #geoip_plugin: false
@@ -34,9 +34,9 @@ min_heap_size: '-Xms1g'
 
 max_heap_size: '-Xmx1g'
 
-discovery_hosts: 'discovery.zen.ping.unicast.hosts: ["", "", "", "", "" ]'
+discovery_hosts: 'discovery.zen.ping.unicast.hosts: ["192.168.58.121", "192.168.58.122", "192.168.58.123", "192.168.58.124", "192.168.58.125", "192.168.58.126" ]'
 
-self_host_ip: '34.'
+self_host_ip: '192.'
 
 #cloud config
 

@@ -38,18 +38,22 @@
   register: elast_network_ip
 
 - name: Making network changes in Elastic yaml file
-  replace:
+  lineinfile:
     dest: '/etc/elasticsearch/elasticsearch.yml'
-    regexp: '#network.host: 192.168.0.1'
-    replace: 'network.host: {{ elast_network_ip.stdout }}'
+    line: 'network.host: {{ elast_network_ip.stdout }}'
+    state: present
 
 - name: Enabling memlock in Elastic yaml file
-  replace:
+  lineinfile:
     dest: '/etc/elasticsearch/elasticsearch.yml'
-    regexp: '#bootstrap.memory_lock: true'
-    replace: 'bootstrap.memory_lock: true'
+    line: 'bootstrap.memory_lock: true'
+    state: present
 
-#^till here
+- name: Removing all Comments
+  lineinfile:
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    regexp: '^[#].*'
+    state: absent
 
 - name: Setting memlock to infinite in Elastic service file
   replace:
@@ -58,21 +62,21 @@
     replace: 'LimitMEMLOCK=infinity'
 
 - name: Changing locked memory state in Elastic service file
-  replace:
+  lineinfile:
     dest: '/etc/default/elasticsearch'
-    regexp: '#MAX_LOCKED_MEMORY=unlimited'
-    replace: 'MAX_LOCKED_MEMORY=unlimited'
+    line: 'MAX_LOCKED_MEMORY=unlimited'
+    state: present
 
 - name: Changing limit for open number of files(for swap)
   shell: "ulimit -l unlimited"
 
-- name: Changing Java minimum heap size for Elastic in jvm.options to- {{min_heap_size}}
+- name: Changing Java minimum heap size for Elastic in jvm.options to {{min_heap_size}}
   replace:
     dest: '/etc/elasticsearch/jvm.options'
     regexp: '-Xms[0-9]g'
     replace: '{{min_heap_size}}'
 
-- name: Changing Java maximum heap size for Elastic in jvm.options to- {{max_heap_size}}
+- name: Changing Java maximum heap size for Elastic in jvm.options to {{max_heap_size}}
   replace:
     dest: '/etc/elasticsearch/jvm.options'
     regexp: '-Xmx[0-9]g'
