@@ -1,0 +1,31 @@
+---
+- name: Installing Nginx
+  apt:
+    name:
+      - nginx
+    state: present
+
+- name: Creating Nginx SSL Certificate
+  shell: "{encrypt} genrsa -out /etc/ssl/nginx_server.pem 2048"
+#  command: openssl req -new -x509 -key /etc/ssl/nginx_server.pem -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=${ansible_fqdn}" -out /etc/ssl/nginx_server.crt -days 3650
+
+#- name: Enabling Nginx Proxy on 5601 file
+#  lineinfile:
+#    dest: '/etc/nginx/sites-available/default'
+#    line: ''
+#    state: present
+
+- name: Starting nginx Service
+  service:
+    name: nginx
+    state: started
+
+- name: Starting Kibana Service
+  service:
+    name: kibana
+    state: restarted
+
+- name: Reload System Daemon to reread all config files
+  systemd:
+    name: elastic
+    daemon_reload: yes

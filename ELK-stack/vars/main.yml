@@ -3,21 +3,23 @@
 ---
 elkstack_install: false
 
-elastic_all_install: true
+elastic_all_install: false
 
 elastic_cloud_install: false
 
-elastic_master_install: true
+elastic_master_install: false
 
 elastic_master_cloud_install: false
 
-elastic_data_install: true
+elastic_data_install: false
 
 elastic_data_cloud_install: false
 
 logstash_install: false
 
-kibana_install: true
+kibana_install: false
+
+kibana_security_install: true
 
 #xpack_plugin: false
 #geoip_plugin: false
@@ -53,3 +55,17 @@ network_bind_host: 'network.bind_host: _ec2:privateIpv4_'
 network_publish_host: 'network.publish_host: _ec2:privateIpv4_'
 
 discovery_type: 'discovery.type: ec2'
+
+
+#Nginx Certificate Start
+
+country_code: 'IN'
+state_full: 'Maharashtra'
+locality_city: 'Mumbai'
+org_name: 'Network Intelligence'
+server_fqdn: 'Kibana'
+days: '3650'
+
+#Nginx Certificate End
+
+encrypt: 'openssl'

@@ -17,6 +17,8 @@
     - include: ../roles/kibana.yml
       when: elkstack_install
 
+    - include: ../roles/kibana_security.yml
+      when: elkstack_install
 
 - hosts: elastic_all
   gather_facts: false
@@ -105,3 +107,7 @@
     - name: Checking whether Kibana Service is required
       include: ../roles/kibana.yml
       when: kibana_install
+
+    - name: Checking whether Kibana Security needs to be installed
+      include: ../roles/kibana_security.yml
+      when: kibana_security_install

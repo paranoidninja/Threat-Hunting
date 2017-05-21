@@ -24,4 +24,4 @@ LS1 ansible_ssh_host=192.168.58.127
 LS2 ansible_ssh_host=192.168.58.128
 
 [kibana]
-ES1 ansible_ssh_host=192.168.58.121
+ELK ansible_ssh_host=192.168.58.103

@@ -51,22 +51,16 @@
     state: present
 
 - name: Adding Cluster Name
-  replace:
+  lineinfile:
     dest: '/etc/elasticsearch/elasticsearch.yml'
-    regexp: '#cluster.name: my-application'
-    replace: 'cluster.name: Anarchy_cloud'
-
-- name: Enabling memlock in Elastic yaml file
-  replace:
-    dest: '/etc/elasticsearch/elasticsearch.yml'
-    regexp: '#bootstrap.memory_lock: true'
-    replace: 'bootstrap.memory_lock: true'
+    line: 'cluster.name: Anarchy_cloud'
+    state: present
 
 - name: Changing Node Discoveries
-  replace:
+  lineinfile:
     dest: '/etc/elasticsearch/elasticsearch.yml'
-    regexp: '^#discovery.zen.ping.unicast.hosts: \["host1", "host2"\]'
-    replace: '{{ discovery_hosts }}'
+    line: '{{ discovery_hosts }}'
+    state: present
 
 - name: Disabling Data node
   lineinfile:
@@ -80,11 +74,11 @@
     line: 'node.master: false'
     state: present
 
-- name: Changing Minimum Master nodes
-  replace:
+- name: Changing Node Discoveries
+  lineinfile:
     dest: '/etc/elasticsearch/elasticsearch.yml'
-    regexp: '#discovery.zen.minimum_master_nodes: 3'
-    replace: 'discovery.zen.minimum_master_nodes: 2'
+    line: '{{ discovery_hosts }}'
+    state: present
 
 - name: Removing all Comments
   lineinfile:
