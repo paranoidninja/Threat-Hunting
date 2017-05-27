@@ -17,14 +17,9 @@ elastic_data_cloud_install: false
 
 logstash_install: false
 
-kibana_install: false
+kibana_install: true
 
 kibana_security_install: true
-
-#xpack_plugin: false
-#geoip_plugin: false
-#translate_plugin: false
-#useragent_plugin: false
 
 es_home: '/usr/share/elasticsearch'
 
@@ -64,8 +59,9 @@ state_full: 'Maharashtra'
 locality_city: 'Mumbai'
 org_name: 'Network Intelligence'
 server_fqdn: 'Kibana'
-days: '3650'
+valid_days: '3650'
 
 #Nginx Certificate End
 
-encrypt: 'openssl'
+#Nginx Username and password
+nginx_creds: 'kibanaAdmin:$apr1$Z5ERJ1.y$YF31NBdA6Q6UhOr.53ggR1'

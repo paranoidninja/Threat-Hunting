@@ -5,20 +5,55 @@
       - nginx
     state: present
 
-- name: Creating Nginx SSL Certificate
-  shell: "{encrypt} genrsa -out /etc/ssl/nginx_server.pem 2048"
-#  command: openssl req -new -x509 -key /etc/ssl/nginx_server.pem -subj "/C=US/ST=Oregon/L=Portland/O=IT/CN=${ansible_fqdn}" -out /etc/ssl/nginx_server.crt -days 3650
+- name: Creating Nginx SSL Private Key
+  command: openssl genrsa -out /etc/ssl/nginx_server.pem 2048
 
-#- name: Enabling Nginx Proxy on 5601 file
-#  lineinfile:
-#    dest: '/etc/nginx/sites-available/default'
-#    line: ''
-#    state: present
+- name: Creating Nginx SSL Certificate
+  command: openssl req -new -x509 -key /etc/ssl/nginx_server.pem -subj "/C={{ country_code}}/ST={{ state_full }}/L={{ locality_city }}/O={{ org_name }}/CN={{ server_fqdn }}" -out /etc/ssl/nginx_server.crt -days {{ valid_days }}
+
+- name: Removing Default Nginx Config file
+  shell: echo '' > /etc/nginx/sites-available/default
+
+- name: Checking IP Address
+  shell: "ifconfig | grep {{ self_host_ip }} | cut -f2 -d':' | awk 'NR==1{print $1}'"
+  register: nginx_network_ip
+
+- name: Creating Blank htpasswd file
+  file: path=/etc/nginx/htpasswd.users state=touch
+
+- name: Creating a default user 'kibanaAdmin' and password 'Zup3r@Dm!n'
+  lineinfile:
+    dest: '/etc/nginx/htpasswd.users'
+    line: '{{ nginx_creds }}'
+    state: present
+
+- name: Enabling Nginx Proxy on 5601
+  blockinfile:
+    dest: '/etc/nginx/sites-available/default'
+    block: |
+      server {
+        listen 443;
+        ssl on;
+        ssl_certificate_key /etc/ssl/nginx_server.pem;
+        ssl_certificate /etc/ssl/nginx_server.crt;
+
+        auth_basic "Restricted Access";
+        auth_basic_user_file /etc/nginx/htpasswd.users;
+
+        location / {
+          proxy_pass http://{{ nginx_network_ip.stdout }}:5601;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection 'upgrade';
+          proxy_set_header Host $host;
+          proxy_cache_bypass $http_upgrade;
+        }
+      }
 
 - name: Starting nginx Service
   service:
     name: nginx
-    state: started
+    state: restarted
 
 - name: Starting Kibana Service
   service:
