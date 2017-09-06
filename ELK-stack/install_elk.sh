@@ -40,6 +40,8 @@ Elastic() {
 		service elasticsearch restart
 		sudo /bin/systemctl daemon-reload
 		sudo /bin/systemctl enable elasticsearch.service
+		echo -e "`tput setaf 3`\n[+] Waiting for Elastic Service to Start...\n`tput setaf 7`"
+		sleep 5
 		curl http://localhost:9200/_nodes?filter_path=**.mlockall | grep mlockall
 	fi;
 
