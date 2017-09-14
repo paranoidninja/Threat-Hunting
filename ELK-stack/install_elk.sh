@@ -25,7 +25,7 @@ Elastic() {
 
 	#Changing Network Hosts
 	echo -e "`tput setaf 3`\n[+] Modifying Network Details...\n`tput setaf 7`"
-	sed -i "s/\#network.host: 192.168.0.1/network.host: 0.0.0.0/g" /etc/elasticsearch/elasticsearch.yml
+	sed -i "s/\#network.host: 192.168.0.1/network.host: 127.0.0.1/g" /etc/elasticsearch/elasticsearch.yml
 
 	#Disabling Java Swap for Elasticsearch only
 	if [ "$disable_swap" = true ]; then
