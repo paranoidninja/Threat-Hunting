@@ -14,6 +14,7 @@ max_heap_size="-Xmx2g"	#Change Maximum Heap Size as per requirement
 EIP="192.168.1.10"
 
 Elastic() {
+    rm -rf /etc/apt/sources.list.d/elastic-*
 	echo -e "`tput setaf 3`\n[+] Installing Elasticsearch...\n`tput setaf 7`"
     wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
     echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
