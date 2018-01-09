@@ -22,7 +22,7 @@ Elastic() {
 
 	#Changing Network Hosts
 	echo -e "`tput setaf 3`\n[+] Modifying Network Details...\n`tput setaf 7`"
-    echo "" >> /etc/elasticsearch/elasticsearch.yml
+    echo "" > /etc/elasticsearch/elasticsearch.yml
     echo "cluster.name: ThreatHunting" >> /etc/elasticsearch/elasticsearch.yml
     echo "node.name: ATH-1" >> /etc/elasticsearch/elasticsearch.yml
     echo "path.data: /var/lib/elasticsearch" >> /etc/elasticsearch/elasticsearch.yml
