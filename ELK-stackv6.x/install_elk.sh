@@ -14,23 +14,23 @@ max_heap_size="-Xmx2g"	#Change Maximum Heap Size as per requirement
 EIP="192.168.1.10"
 
 Elastic() {
-    rm -rf /etc/apt/sources.list.d/elastic-*
+	rm -rf /etc/apt/sources.list.d/elastic-*
 	echo -e "`tput setaf 3`\n[+] Installing Elasticsearch...\n`tput setaf 7`"
-    wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-    echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
+	wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+	echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
 	apt-get update && apt-get -y install elasticsearch apt-transport-https curl git wget openjdk-8-jre
 	service elasticsearch stop
 
 	#Changing Network Hosts
 	echo -e "`tput setaf 3`\n[+] Modifying Network Details...\n`tput setaf 7`"
-    echo "" > /etc/elasticsearch/elasticsearch.yml
-    echo "cluster.name: ThreatHunting" >> /etc/elasticsearch/elasticsearch.yml
-    echo "node.name: ATH-1" >> /etc/elasticsearch/elasticsearch.yml
-    echo "path.data: /var/lib/elasticsearch" >> /etc/elasticsearch/elasticsearch.yml
-    echo "path.logs: /var/log/elasticsearch" >> /etc/elasticsearch/elasticsearch.yml
-    echo "http.host: $EIP" >> /etc/elasticsearch/elasticsearch.yml
-    echo "network.host: $EIP" >> /etc/elasticsearch/elasticsearch.yml
-    echo "http.port: 9200" >> /etc/elasticsearch/elasticsearch.yml
+	echo "" > /etc/elasticsearch/elasticsearch.yml
+	echo "cluster.name: ThreatHunting" >> /etc/elasticsearch/elasticsearch.yml
+	echo "node.name: ATH-1" >> /etc/elasticsearch/elasticsearch.yml
+	echo "path.data: /var/lib/elasticsearch" >> /etc/elasticsearch/elasticsearch.yml
+	echo "path.logs: /var/log/elasticsearch" >> /etc/elasticsearch/elasticsearch.yml
+	echo "http.host: $EIP" >> /etc/elasticsearch/elasticsearch.yml
+	echo "network.host: $EIP" >> /etc/elasticsearch/elasticsearch.yml
+	echo "http.port: 9200" >> /etc/elasticsearch/elasticsearch.yml
 
 	#Disabling Java Swap for Elasticsearch only
 	if [ "$disable_swap" = true ]; then
@@ -40,11 +40,11 @@ Elastic() {
 		service elasticsearch stop
 		sudo /bin/systemctl daemon-reload
 		sudo /bin/systemctl enable elasticsearch.service
-        echo -e "`tput setaf 3`\n[+] Disabling JVM Swap...\n`tput setaf 7`"
-        echo "bootstrap.memory_lock: true" >> /etc/elasticsearch/elasticsearch.yml
-        echo -e "[Service]\nLimitMEMLOCK=infinity" >> /etc/systemd/system/elasticsearch.service.d/override.conf
-        echo "MAX_LOCKED_MEMORY=unlimited" >> /etc/default/elasticsearch
-        ulimit -l unlimited
+		echo -e "`tput setaf 3`\n[+] Disabling JVM Swap...\n`tput setaf 7`"
+        	echo "bootstrap.memory_lock: true" >> /etc/elasticsearch/elasticsearch.yml
+        	echo -e "[Service]\nLimitMEMLOCK=infinity" >> /etc/systemd/system/elasticsearch.service.d/override.conf
+        	echo "MAX_LOCKED_MEMORY=unlimited" >> /etc/default/elasticsearch
+        	ulimit -l unlimited
 		sudo /bin/systemctl daemon-reload
 		echo -e "`tput setaf 3`\n[+] Waiting for Elastic Service to Start...\n`tput setaf 7`"
 		sleep 5
